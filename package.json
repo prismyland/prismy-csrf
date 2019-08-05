@@ -1,0 +1,68 @@
+{
+  "name": "prismy-csrf",
+  "version": "0.0.0",
+  "description": ":shield: CSRF Protection for prismy",
+  "keywords": [
+    "prismy",
+    "csrf"
+  ],
+  "author": "Junyoung Choi <rokt33r.choi@gmail.com>",
+  "homepage": "https://github.com/prismyland/prismy-csrf",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "!dist/specs/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prismyland/prismy-csrf.git"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -P tsconfig.build.json",
+    "lint": "prettier --check src/**/*.ts specs/**/*.ts",
+    "format": "prettier --write src/**/*.ts specs/**/*.ts",
+    "test": "ava --verbose",
+    "test-ci": "nyc ava && nyc report --reporter=text-lcov > coverage.lcov",
+    "codecov": "codecov",
+    "prepublishOnly": "npm run lint && npm test && npm run build"
+  },
+  "bugs": {
+    "url": "https://github.com/prismyland/prismy-csrf/issues"
+  },
+  "devDependencies": {
+    "@types/got": "^9.4.4",
+    "@types/node": "^12.0.2",
+    "ava": "^1.4.1",
+    "codecov": "^3.5.0",
+    "got": "^9.6.0",
+    "nyc": "^14.1.1",
+    "prettier": "^1.17.1",
+    "prismy": "^0.12.2",
+    "prismy-test-server": "^0.4.0",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8.2.0",
+    "typescript": "^3.4.5"
+  },
+  "peerDependencies": {
+    "prismy": "^0.12.2"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "files": [
+      "specs/**/*.spec.ts"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ]
+  }
+}
