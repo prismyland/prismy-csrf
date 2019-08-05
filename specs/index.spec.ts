@@ -1,19 +1,20 @@
 import test from 'ava'
 import { testServer } from 'prismy-test-server'
 import got from 'got'
-import createCSRFProtection from '../src'
+import createCSRFProtection, { CSRFStrategy } from '../src'
 import { Context } from 'prismy'
 
-test('CSRFToken issues a token', async t => {
-  const strategy = {
-    issuer() {
-      return 'test'
-    },
-    verifier() {
-      return true
-    }
+const testStrategy: CSRFStrategy = {
+  issuer() {
+    return 'test'
+  },
+  verifier(context: Context) {
+    return context.req.headers['csrf-token'] === 'test'
   }
-  const { CSRFToken } = createCSRFProtection(strategy)
+}
+
+test('CSRFToken issues a token', async t => {
+  const { CSRFToken } = createCSRFProtection(testStrategy)
   class MyHandler {
     handle(@CSRFToken() csrfToken: string) {
       return {
@@ -33,15 +34,7 @@ test('CSRFToken issues a token', async t => {
 })
 
 test('CSRFMiddleware validates a token', async t => {
-  const strategy = {
-    issuer() {
-      return 'test'
-    },
-    verifier(context: Context) {
-      return context.req.headers['csrf-token'] === 'test'
-    }
-  }
-  const { CSRFMiddleware } = createCSRFProtection(strategy)
+  const { CSRFMiddleware } = createCSRFProtection(testStrategy)
   class MyHandler {
     handle() {
       return 'Hello, World!'
@@ -59,17 +52,10 @@ test('CSRFMiddleware validates a token', async t => {
 })
 
 test('CSRFMiddleware throws when invalid token is given', async t => {
-  const strategy = {
-    issuer() {
-      return 'test'
-    },
-    verifier(context: Context) {
-      return context.req.headers['csrf-token'] === 'test'
-    }
-  }
-  const { CSRFMiddleware } = createCSRFProtection(strategy)
+  const { CSRFMiddleware } = createCSRFProtection(testStrategy)
   class MyHandler {
     handle() {
+      /* istanbul ignore next */
       return 'Hello, World!'
     }
   }
@@ -87,15 +73,7 @@ test('CSRFMiddleware throws when invalid token is given', async t => {
 })
 
 test('CSRFMiddleware ignores methods in `ignoreMethods` option', async t => {
-  const strategy = {
-    issuer() {
-      return 'test'
-    },
-    verifier(context: Context) {
-      return context.req.headers['csrf-token'] === 'test'
-    }
-  }
-  const { CSRFMiddleware } = createCSRFProtection(strategy, {
+  const { CSRFMiddleware } = createCSRFProtection(testStrategy, {
     ignoreMethods: ['GET', 'HEAD', 'OPTIONS', 'POST']
   })
   class MyHandler {
